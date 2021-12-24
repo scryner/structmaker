@@ -86,6 +86,8 @@ func traverse(baseName string, m map[string]interface{}, objs *[]structObject) {
 			fieldType = "float64"
 		case string:
 			fieldType = "string"
+		case bool:
+			fieldType = "bool"
 		case map[string]interface{}:
 			subName := strcase.ToCamel(k)
 			traverse(subName, c, objs)
@@ -102,6 +104,8 @@ func traverse(baseName string, m map[string]interface{}, objs *[]structObject) {
 					fieldType = "[]float64"
 				case string:
 					fieldType = "[]string"
+				case bool:
+					fieldType = "[]bool"
 				default:
 					skip = true
 				}
