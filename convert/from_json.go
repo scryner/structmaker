@@ -97,7 +97,7 @@ func traverse(baseName string, m map[string]interface{}, objs *[]structObject) {
 				skip = true
 			} else {
 				first := c[0]
-				switch first.(type) {
+				switch fc := first.(type) {
 				case int:
 					fieldType = "[]int"
 				case float64:
@@ -106,6 +106,10 @@ func traverse(baseName string, m map[string]interface{}, objs *[]structObject) {
 					fieldType = "[]string"
 				case bool:
 					fieldType = "[]bool"
+				case map[string]interface{}:
+					subName := guessSubName(k)
+					traverse(subName, fc, objs)
+
 				default:
 					skip = true
 				}
@@ -122,4 +126,17 @@ func traverse(baseName string, m map[string]interface{}, objs *[]structObject) {
 	}
 
 	*objs = append(*objs, so)
+}
+
+func guessSubName(k string) string {
+	l := len(k)
+	if l < 2 {
+		return fmt.Sprintf("%sElement", k)
+	}
+
+	if k[l-1] == 's' {
+		return strcase.ToCamel(k[:l-1])
+	}
+
+	return fmt.Sprintf("%sElement", strcase.ToCamel(k))
 }
