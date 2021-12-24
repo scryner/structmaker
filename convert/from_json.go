@@ -109,6 +109,7 @@ func traverse(baseName string, m map[string]interface{}, objs *[]structObject) {
 				case map[string]interface{}:
 					subName := guessSubName(k)
 					traverse(subName, fc, objs)
+					fieldType = fmt.Sprintf("[]%s", subName)
 
 				default:
 					skip = true
