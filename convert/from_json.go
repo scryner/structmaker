@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/iancoleman/strcase"
 	"strings"
+	"time"
 )
 
 func FromJson(b []byte, baseStructName string) (string, error) {
@@ -85,7 +86,7 @@ func traverse(baseName string, m map[string]interface{}, objs *[]structObject) {
 		case float64:
 			fieldType = "float64"
 		case string:
-			fieldType = "string"
+			fieldType = guessStringType(c)
 		case bool:
 			fieldType = "bool"
 		case map[string]interface{}:
@@ -103,7 +104,7 @@ func traverse(baseName string, m map[string]interface{}, objs *[]structObject) {
 				case float64:
 					fieldType = "[]float64"
 				case string:
-					fieldType = "[]string"
+					fieldType = fmt.Sprintf("[]%s", guessStringType(fc))
 				case bool:
 					fieldType = "[]bool"
 				case map[string]interface{}:
@@ -140,4 +141,25 @@ func guessSubName(k string) string {
 	}
 
 	return fmt.Sprintf("%sElement", strcase.ToCamel(k))
+}
+
+type ti struct {
+	At time.Time `json:"at"`
+}
+
+func guessStringType(v string) string {
+	// try to parse time
+	var t ti
+	err := json.Unmarshal([]byte(fmt.Sprintf(`{"at": "%s"}`, v)), &t)
+	if err == nil {
+		return "time.Time"
+	}
+
+	// try to parse duration
+	_, err = time.ParseDuration(v)
+	if err == nil {
+		return "time.Duration"
+	}
+
+	return "string"
 }
