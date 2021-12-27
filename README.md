@@ -1,7 +1,7 @@
 structmaker
 ===========
 
-A simple utility to generate struct from smample json for Go
+A simple utility to generate struct from json for Go
 
 ## Usage
 ```sh
